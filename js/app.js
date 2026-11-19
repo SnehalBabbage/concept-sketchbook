@@ -745,11 +745,25 @@ function openSamples() {
   $('samples-dlg').showModal();
 }
 
+// Back to the start page. The open map is already saved, and a sketch in progress keeps running.
+function goHome() {
+  save(true);
+  state.map = null;
+  state.selected = null;
+  renderBoard();
+  renderPanel();
+  renderSampleCards($('sample-grid'));
+  if (!state.gen) $('progress').hidden = true;
+  $('workspace').scrollTop = 0;
+  window.scrollTo(0, 0);
+}
+
 async function init() {
   applyTheme();
   wire();
   updateCalls();
   $('open-samples').addEventListener('click', openSamples);
+  $('home').addEventListener('click', (e) => { e.preventDefault(); goHome(); });
   loadSamples();
   try {
     const key = await finishSignIn();

@@ -89,7 +89,8 @@ label.check { display: flex; gap: 8px; align-items: flex-start; font-weight: 400
   padding: 10px 16px; border-bottom: 1.5px solid var(--line); background: var(--paper);
   position: sticky; top: 0; z-index: 5;
 }
-.brand { display: flex; gap: 8px; align-items: center; font-family: var(--hand); font-size: 22px; }
+.brand { display: flex; gap: 8px; align-items: center; font-family: var(--hand); font-size: 22px; color: var(--ink); text-decoration: none; border-radius: 8px; }
+.brand:hover span { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
 .logo { width: 30px; height: 30px; fill: none; stroke: var(--ink); stroke-width: 1.6; }
 .logo .logo-dash { stroke-dasharray: 3 2.5; }
 .logo .logo-pencil { fill: var(--paper-2); }
