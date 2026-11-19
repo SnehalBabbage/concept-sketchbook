@@ -1,5 +1,5 @@
 // SVG rendering of the map: pencil-style marks, drag, pan, zoom and keyboard moves.
-import { WIDTH, HEIGHT } from './layout.js';
+import { WIDTH, HEIGHT } from './layout.js?v=32d83d848e';
 
 const NS = 'http://www.w3.org/2000/svg';
 const R = 22; // concept circle radius

@@ -278,3 +278,7 @@ legend { font-weight: 700; padding: 0 6px; }
 .card-wrap { display: flex; flex-direction: column; gap: 4px; }
 .card-wrap .btn { align-self: flex-start; font-size: 12.5px; min-height: 28px; padding: 2px 8px; }
 .dialog.wide { width: min(980px, calc(100vw - 32px)); }
+
+/* Continue banner on the start page */
+.resume { display: flex; gap: 8px 12px; align-items: center; flex-wrap: wrap; margin: 18px 0 0; padding: 10px 14px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); }
+.resume > span { flex: 1 1 260px; }

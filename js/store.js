@@ -1,6 +1,6 @@
 // Browser storage. Maps and settings live in localStorage; the API key lives in
 // sessionStorage only (OR-01) and is never part of a map or an export.
-import { DEFAULT_MODELS, DEFAULT_DAILY_CAP } from './config.js';
+import { DEFAULT_MODELS, DEFAULT_DAILY_CAP } from './config.js?v=32d83d848e';
 
 const K = {
   index: 'cs.maps.index',

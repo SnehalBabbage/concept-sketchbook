@@ -16,6 +16,12 @@ Then open http://localhost:5173 and add an OpenRouter key in Settings (a free ke
 
 Any static host works. On GitHub Pages: push this folder to a repository, then in the repository's Settings → Pages choose "Deploy from a branch", branch `main`, folder `/ (root)`.
 
+After changing anything in `css/` or `js/`, stamp the asset URLs before committing, so visitors get the new files instead of a cached copy:
+
+```bash
+node scripts/stamp-version.mjs
+```
+
 ## How it works
 
 | File | Role |

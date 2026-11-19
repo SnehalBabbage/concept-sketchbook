@@ -1,11 +1,11 @@
 // Concept Sketchbook: app shell, panel, dialogs and generation flow.
-import { RELATIONS, SEARCH_SITES, DEFAULT_MODELS, TOPIC_MAX } from './config.js';
-import * as store from './store.js';
-import { ApiError, fetchFreeModels, startSignIn, finishSignIn } from './openrouter.js';
-import { Pipeline, STAGES, regenerateConcept, uid } from './pipeline.js';
-import { createMapView } from './map.js';
-import { freeSpot } from './layout.js';
-import { findReferences, sanitizeRefs } from './sources.js';
+import { RELATIONS, SEARCH_SITES, DEFAULT_MODELS, TOPIC_MAX } from './config.js?v=32d83d848e';
+import * as store from './store.js?v=32d83d848e';
+import { ApiError, fetchFreeModels, startSignIn, finishSignIn } from './openrouter.js?v=32d83d848e';
+import { Pipeline, STAGES, regenerateConcept, uid } from './pipeline.js?v=32d83d848e';
+import { createMapView } from './map.js?v=32d83d848e';
+import { freeSpot } from './layout.js?v=32d83d848e';
+import { findReferences, sanitizeRefs } from './sources.js?v=32d83d848e';
 
 const $ = (id) => document.getElementById(id);
 
@@ -753,9 +753,26 @@ function goHome() {
   renderBoard();
   renderPanel();
   renderSampleCards($('sample-grid'));
+  renderResume();
   if (!state.gen) $('progress').hidden = true;
   $('workspace').scrollTop = 0;
   window.scrollTo(0, 0);
+}
+
+// The start page offers the most recent map instead of reopening it on load.
+function renderResume() {
+  const last = store.listMaps()[0];
+  const box = $('resume');
+  box.hidden = !last;
+  if (!last) { box.replaceChildren(); return; }
+  box.replaceChildren(
+    h('span', {}, 'Continue where you left off: ', h('strong', {}, last.topic), ` (${last.count} concepts)`),
+    h('button', { type: 'button', class: 'btn primary', onclick: () => {
+      const map = store.loadMap(last.id);
+      if (map) setMap(map); else { toast('That map could not be read.'); renderResume(); }
+    } }, 'Continue'),
+    h('button', { type: 'button', class: 'btn ghost', onclick: openMaps }, 'All my maps'),
+  );
 }
 
 async function init() {
@@ -771,10 +788,8 @@ async function init() {
   } catch (e) {
     toast(e.message);
   }
-  const last = store.listMaps()[0];
-  const map = last && store.loadMap(last.id);
-  if (map) setMap(map);
-  else renderBoard();
+  renderBoard();
+  renderResume();
 }
 
 init();

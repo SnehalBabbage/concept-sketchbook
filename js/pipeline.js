@@ -1,9 +1,9 @@
 // Staged generation: three model stages that return short, scoped JSON, then a code stage
 // that runs the quality gates and lays the map out. Finished stages are kept, so a failed
 // stage can be retried without redoing the others (FR-13).
-import { RELATIONS, MIN_CONCEPTS, MAX_CONCEPTS, MAX_EXPLANATION, DETAIL_BATCH, MAX_CALLS_PER_GRAPH } from './config.js';
-import { ask } from './openrouter.js';
-import { layout } from './layout.js';
+import { RELATIONS, MIN_CONCEPTS, MAX_CONCEPTS, MAX_EXPLANATION, DETAIL_BATCH, MAX_CALLS_PER_GRAPH } from './config.js?v=32d83d848e';
+import { ask } from './openrouter.js?v=32d83d848e';
+import { layout } from './layout.js?v=32d83d848e';
 
 export const STAGES = [
   { id: 'outline', label: 'Outline the concepts' },

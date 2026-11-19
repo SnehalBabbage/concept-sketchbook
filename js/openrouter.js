@@ -1,6 +1,6 @@
 // OpenRouter is the only model gateway. Everything goes through ask().
-import { APP_TITLE, OPENROUTER, RATE_LIMIT_WAIT_MS, REQUEST_TIMEOUT_MS } from './config.js';
-import { addCall, callsToday, getPkce, setPkce } from './store.js';
+import { APP_TITLE, OPENROUTER, RATE_LIMIT_WAIT_MS, REQUEST_TIMEOUT_MS } from './config.js?v=32d83d848e';
+import { addCall, callsToday, getPkce, setPkce } from './store.js?v=32d83d848e';
 
 export class ApiError extends Error {
   // kind: key | cap | budget | rate | unavailable | invalid | aborted | failed
