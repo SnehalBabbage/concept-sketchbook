@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://openrouter.ai; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="description" content="Type a topic, get a rough-draft concept map you can guess, check, doubt and extend.">
+  <title>Concept Sketchbook</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#topic">Skip to topic</a>
+  <header class="topbar">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true" class="logo"><circle cx="9" cy="10" r="5" class="logo-dash"/><circle cx="23" cy="22" r="5"/><path d="M13 13 L19 19"/><path d="M20 6 l6 6 -10 10 -7 1 1 -7z" class="logo-pencil"/></svg>
+      <span>Concept Sketchbook</span>
+    </div>
+    <form id="topic-form" class="topic-form" autocomplete="off">
+      <label for="topic" class="sr-only">Topic to sketch</label>
+      <input id="topic" name="topic" type="text" maxlength="200" required placeholder="A topic, e.g. how vaccines train the immune system">
+      <button type="submit" id="sketch" class="btn primary">Sketch it</button>
+      <button type="button" id="cancel" class="btn" hidden>Cancel</button>
+    </form>
+    <nav class="top-actions" aria-label="App">
+      <span id="calls" class="calls" title="OpenRouter calls made from this browser today"></span>
+      <button type="button" id="open-maps" class="btn ghost">My maps</button>
+      <button type="button" id="open-settings" class="btn ghost">Settings</button>
+    </nav>
+  </header>
+
+  <section id="progress" class="progress" hidden aria-live="polite">
+    <ol id="stages" class="stages"></ol>
+    <div id="gen-error" class="gen-error" role="alert" hidden>
+      <p id="gen-error-text"></p>
+      <div class="row">
+        <button type="button" id="retry" class="btn primary">Retry this stage</button>
+        <button type="button" id="dismiss-error" class="btn">Dismiss</button>
+      </div>
+    </div>
+  </section>
+
+  <main id="workspace" class="workspace">
+    <section id="empty" class="empty">
+      <h1>See the shape of a subject before you learn it.</h1>
+      <p>Type a topic and an AI sketches a rough concept map in pencil. It is a <strong>draft, not an authority</strong>: guess first, check against a source, doubt what looks wrong, and add what you know.</p>
+      <div class="chips" id="examples" aria-label="Example topics"></div>
+      <ol class="how">
+        <li><strong>Guess.</strong> Write your own one-line explanation before you see the draft.</li>
+        <li><strong>Check or doubt.</strong> Use the search links, then mark a concept checked, or doubt it or a single link.</li>
+        <li><strong>Add.</strong> Your own concepts are diamonds, so you can see what you know and what the AI guessed.</li>
+      </ol>
+      <p class="fine">You need an OpenRouter key (a free one works). Free models may train on prompts, so don't type private material. Maps stay in this browser.</p>
+      <div class="row center">
+        <button type="button" id="empty-key" class="btn">Add a key</button>
+        <button type="button" id="empty-maps" class="btn ghost">Open a saved map</button>
+      </div>
+    </section>
+
+    <section id="board" class="board" hidden>
+      <div class="banner" role="note">
+        <span class="banner-tag">AI draft</span>
+        <span>An AI guessed this map. Nothing on it is checked until you check it.</span>
+      </div>
+      <div class="board-head">
+        <h2 id="map-title" class="map-title"></h2>
+        <p id="tally" class="tally" aria-live="polite"></p>
+      </div>
+      <div class="toolbar" role="toolbar" aria-label="Map tools">
+        <button type="button" id="add-concept" class="btn">+ Add my concept</button>
+        <span class="sep" aria-hidden="true"></span>
+        <button type="button" id="zoom-out" class="btn icon" aria-label="Zoom out">−</button>
+        <button type="button" id="zoom-in" class="btn icon" aria-label="Zoom in">+</button>
+        <button type="button" id="zoom-fit" class="btn">Fit</button>
+        <span class="sep" aria-hidden="true"></span>
+        <button type="button" id="export" class="btn">Export</button>
+        <details id="report" class="report"><summary></summary><ul></ul></details>
+      </div>
+      <div class="canvas-wrap">
+        <svg id="map" class="map" role="group" aria-label="Concept map. Tab to a concept or link, Enter to open it, arrow keys to move a concept."></svg>
+        <div class="legend" aria-label="Legend">
+          <span><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7" class="lg-unchecked"/></svg>Draft</span>
+          <span><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7" class="lg-checked"/></svg>Checked</span>
+          <span><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7" class="lg-doubted"/></svg>Doubted</span>
+          <span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2 18 10 10 18 2 10z" class="lg-added"/></svg>Yours</span>
+        </div>
+      </div>
+    </section>
+
+    <aside id="panel" class="panel" aria-label="Details" hidden></aside>
+  </main>
+
+  <dialog id="settings" class="dialog" aria-labelledby="settings-title">
+    <form method="dialog" class="dialog-body" id="settings-form">
+      <h2 id="settings-title">Settings</h2>
+
+      <fieldset>
+        <legend>OpenRouter key</legend>
+        <p class="fine">Kept for this tab only and cleared when you close it. Never saved in maps or exports, never put in a URL, and sent only to openrouter.ai. Use a key with a low credit limit.</p>
+        <label for="key">Key</label>
+        <div class="row">
+          <input id="key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-or-v1-…">
+          <button type="button" id="key-show" class="btn" aria-pressed="false">Show</button>
+        </div>
+        <p id="key-state" class="fine"></p>
+        <div class="row">
+          <button type="button" id="signin" class="btn">Sign in with OpenRouter</button>
+          <button type="button" id="key-forget" class="btn ghost">Forget key</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Models</legend>
+        <label for="models">Fallback chain, one model ID per line, tried in order</label>
+        <textarea id="models" rows="5" spellcheck="false"></textarea>
+        <div class="row">
+          <button type="button" id="find-free" class="btn">Find current free models</button>
+          <button type="button" id="models-reset" class="btn ghost">Reset to defaults</button>
+        </div>
+        <p id="models-note" class="fine" aria-live="polite"></p>
+        <label for="cap">Stop at this many calls per day</label>
+        <input id="cap" type="number" min="1" max="10000" step="1">
+        <p class="fine">Free models allow about 50 requests a day (1,000 after buying $10 of OpenRouter credits). A map costs 4 to 8 calls.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Learning</legend>
+        <label class="check"><input id="guess-first" type="checkbox"> Guess first: hide each draft until I have written my own guess</label>
+        <label for="theme">Theme</label>
+        <select id="theme">
+          <option value="auto">Match my system</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </fieldset>
+
+      <p class="fine warn">Free models may train on what you send. Prompts contain only your topic and the app's instructions; don't type private material.</p>
+      <div class="row end">
+        <button type="submit" value="cancel" class="btn ghost">Close</button>
+        <button type="submit" value="save" id="settings-save" class="btn primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="maps" class="dialog" aria-labelledby="maps-title">
+    <div class="dialog-body">
+      <h2 id="maps-title">My maps</h2>
+      <p class="fine">Saved in this browser after every change.</p>
+      <ul id="maps-list" class="maps-list"></ul>
+      <h3>Import a map</h3>
+      <label for="import-text">Paste exported map text, or choose a file</label>
+      <textarea id="import-text" rows="4" spellcheck="false"></textarea>
+      <div class="row">
+        <input id="import-file" type="file" accept="application/json,.json,.txt">
+        <button type="button" id="import" class="btn primary">Import</button>
+      </div>
+      <p id="import-note" class="fine" aria-live="polite"></p>
+      <div class="row end"><button type="button" class="btn ghost" data-close>Close</button></div>
+    </div>
+  </dialog>
+
+  <dialog id="export-dlg" class="dialog" aria-labelledby="export-title">
+    <div class="dialog-body">
+      <h2 id="export-title">Export this map</h2>
+      <p class="fine">Plain JSON you control. It contains your map, guesses and notes, never your key.</p>
+      <label for="export-text">Map text</label>
+      <textarea id="export-text" rows="10" readonly spellcheck="false"></textarea>
+      <div class="row">
+        <button type="button" id="copy-export" class="btn primary">Copy</button>
+        <button type="button" id="download-export" class="btn">Download file</button>
+        <span id="export-note" class="fine" aria-live="polite"></span>
+      </div>
+      <div class="row end"><button type="button" class="btn ghost" data-close>Close</button></div>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
