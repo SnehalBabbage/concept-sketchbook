@@ -74,7 +74,7 @@ export function saveMap(map) {
   map.updatedAt = Date.now();
   const ok = write(localStorage, K.map(map.id), map);
   const index = read(localStorage, K.index, []).filter((m) => m.id !== map.id);
-  index.push({ id: map.id, topic: map.topic, updatedAt: map.updatedAt, count: map.concepts.length });
+  index.push({ id: map.id, topic: map.topic, updatedAt: map.updatedAt, count: map.concepts.length, sample: map.sample || '' });
   write(localStorage, K.index, index);
   return ok;
 }

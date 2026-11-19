@@ -570,6 +570,7 @@ function sanitizeMap(raw) {
     }));
   return {
     version: 1, id: uid('m'), topic: s(raw.topic, TOPIC_MAX) || 'Imported map',
+    sample: /^[a-z0-9-]{1,60}$/.test(raw.sample) ? raw.sample : '',
     createdAt: Date.now(), updatedAt: Date.now(),
     models: Array.isArray(raw.models) ? raw.models.map((m) => s(m, 100)).slice(0, 10) : [],
     checks: null, concepts, links,
@@ -685,10 +686,71 @@ function wire() {
   });
 }
 
+// --- Samples: a static database of ready-made maps in samples/ (index.json + one file per map) ---
+let samples = null;
+
+async function loadSamples() {
+  try {
+    const res = await fetch('samples/index.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    samples = (await res.json()).samples || [];
+  } catch {
+    samples = [];
+    $('sample-grid').replaceChildren(h('p', { class: 'fine' }, 'Samples could not be loaded.'));
+    return;
+  }
+  renderSampleCards($('sample-grid'));
+}
+
+function renderSampleCards(grid) {
+  if (!samples) return;
+  const copies = new Map(store.listMaps().filter((m) => m.sample).map((m) => [m.sample, m]));
+  grid.replaceChildren(...samples.map((s) => {
+    const copy = copies.get(s.slug);
+    return h('div', { class: 'card-wrap' },
+      h('button', { type: 'button', class: 'card', onclick: () => openSample(s.slug) },
+        h('span', { class: 'field' }, s.field),
+        h('span', { class: 'name' }, s.topic),
+        h('span', { class: 'blurb' }, s.blurb),
+        h('span', { class: 'meta' }, `${s.concepts} concepts · ${s.links} links${copy ? ' · your copy saved' : ''}`)),
+      copy ? h('button', { type: 'button', class: 'btn ghost', onclick: () => openSample(s.slug, { fresh: true }) }, 'Start fresh') : null);
+  }));
+}
+
+async function openSample(slug, { fresh = false } = {}) {
+  if ($('samples-dlg').open) $('samples-dlg').close();
+  const existing = store.listMaps().find((m) => m.sample === slug);
+  if (existing && fresh) {
+    if (!confirm('Start this sample again? Your guesses, checks and notes on your current copy will be deleted.')) return;
+    store.deleteMap(existing.id);
+  } else if (existing) {
+    const map = store.loadMap(existing.id);
+    if (map) { setMap(map); return; }
+  }
+  try {
+    const res = await fetch(`samples/${slug}.json`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const map = sanitizeMap(await res.json());
+    store.saveMap(map);
+    setMap(map);
+    toast('Sample opened. Your changes are saved to your own copy in this browser.');
+  } catch {
+    toast('That sample could not be loaded. Check your connection and try again.');
+  }
+}
+
+function openSamples() {
+  if (!samples) { toast('Samples are still loading.'); return; }
+  renderSampleCards($('samples-dlg-grid'));
+  $('samples-dlg').showModal();
+}
+
 async function init() {
   applyTheme();
   wire();
   updateCalls();
+  $('open-samples').addEventListener('click', openSamples);
+  loadSamples();
   try {
     const key = await finishSignIn();
     if (key) { store.setKey(key); toast('Signed in with OpenRouter. The key is kept for this tab only.'); }

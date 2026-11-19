@@ -31,6 +31,16 @@ Any static host works. On GitHub Pages: push this folder to a repository, then i
 
 A map costs 4 calls when nothing fails, and is capped at 8 calls per run. The app counts calls made today and stops before the daily cap set in Settings (50 by default, matching OpenRouter's free tier).
 
+## Sample maps
+
+`samples/` is a small static database of 13 ready-made maps that anyone can open without a key: `samples/index.json` lists them and each map is one JSON file in the app's export format. They are written in `samples/src/*.mjs` (concepts as `[name, group, explanation, caveat, test question, search phrases]`, links as `[from, relation, to]`) and built with:
+
+```bash
+node scripts/build-samples.mjs
+```
+
+The build holds every sample to the same gates as a generated map (14 to 30 concepts, explanations of 300 characters or fewer, valid relations, no URLs, every concept linked) plus full connectivity, then precomputes the layout. To add a sample, add an entry to a source file and rebuild. Opening a sample gives the viewer their own copy in browser storage.
+
 ## Privacy
 
 Requests carrying user text go to openrouter.ai (the topic and the app's instructions) and, when a concept is opened, its name and search phrase go to Wikipedia, OpenAlex or Crossref to find references. Free models may train on prompts. The key is never written to maps, exports, URLs or logs.

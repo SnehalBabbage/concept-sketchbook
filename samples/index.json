@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "samples": [
+    {
+      "slug": "risk-management",
+      "topic": "Risk management",
+      "field": "Business",
+      "blurb": "How organisations find, size and decide what to do about uncertainty.",
+      "concepts": 16,
+      "links": 20
+    },
+    {
+      "slug": "cybersecurity",
+      "topic": "Cybersecurity",
+      "field": "Technology",
+      "blurb": "Protecting systems and data: threats, weaknesses and layered defences.",
+      "concepts": 15,
+      "links": 18
+    },
+    {
+      "slug": "weight-training",
+      "topic": "Weight training",
+      "field": "Health",
+      "blurb": "How lifting builds strength and muscle, and what the training variables do.",
+      "concepts": 16,
+      "links": 19
+    },
+    {
+      "slug": "quantum-gravity",
+      "topic": "Quantum gravity",
+      "field": "Physics",
+      "blurb": "Why gravity and quantum theory clash, and the main ideas for reconciling them.",
+      "concepts": 15,
+      "links": 19
+    },
+    {
+      "slug": "vaccines-immune-system",
+      "topic": "How vaccines train the immune system",
+      "field": "Biology",
+      "blurb": "From antigen to memory cell: what a vaccine teaches the body.",
+      "concepts": 16,
+      "links": 20
+    },
+    {
+      "slug": "climate-change",
+      "topic": "Climate change",
+      "field": "Earth science",
+      "blurb": "Greenhouse physics, feedbacks and what mitigation and adaptation mean.",
+      "concepts": 16,
+      "links": 18
+    },
+    {
+      "slug": "machine-learning",
+      "topic": "Machine learning",
+      "field": "Technology",
+      "blurb": "How models learn from data, and why they fail to generalise.",
+      "concepts": 16,
+      "links": 18
+    },
+    {
+      "slug": "behavioral-economics",
+      "topic": "Behavioral economics",
+      "field": "Social science",
+      "blurb": "Where real decisions depart from the rational-agent model, and how policy uses it.",
+      "concepts": 16,
+      "links": 18
+    },
+    {
+      "slug": "sleep-science",
+      "topic": "Sleep science",
+      "field": "Health",
+      "blurb": "What drives sleepiness, what happens in each stage, and why it matters.",
+      "concepts": 16,
+      "links": 17
+    },
+    {
+      "slug": "french-revolution",
+      "topic": "The French Revolution",
+      "field": "History",
+      "blurb": "From fiscal crisis to Napoleon: causes, turning points and outcomes, 1789 to 1799.",
+      "concepts": 16,
+      "links": 18
+    },
+    {
+      "slug": "contract-law",
+      "topic": "Contract law basics",
+      "field": "Law",
+      "blurb": "How agreements become binding, and what happens when they break (common law view).",
+      "concepts": 16,
+      "links": 16
+    },
+    {
+      "slug": "sourdough",
+      "topic": "How sourdough rises",
+      "field": "Food science",
+      "blurb": "Wild microbes, gluten and heat: the science behind a sourdough loaf.",
+      "concepts": 16,
+      "links": 17
+    },
+    {
+      "slug": "music-harmony",
+      "topic": "Music harmony",
+      "field": "Arts",
+      "blurb": "How notes combine into chords and progressions, and why some sound resolved.",
+      "concepts": 16,
+      "links": 18
+    }
+  ]
+}
