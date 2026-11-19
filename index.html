@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://openrouter.ai; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://openrouter.ai https://en.wikipedia.org https://api.openalex.org https://api.crossref.org; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'self'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="description" content="Type a topic, get a rough-draft concept map you can guess, check, doubt and extend.">
   <title>Concept Sketchbook</title>
@@ -63,10 +63,6 @@
     </section>
 
     <section id="board" class="board" hidden>
-      <div class="banner" role="note">
-        <span class="banner-tag">AI draft</span>
-        <span>An AI guessed this map. Nothing on it is checked until you check it.</span>
-      </div>
       <div class="board-head">
         <h2 id="map-title" class="map-title"></h2>
         <p id="tally" class="tally" aria-live="polite"></p>
@@ -89,6 +85,10 @@
           <span><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7" class="lg-doubted"/></svg>Doubted</span>
           <span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2 18 10 10 18 2 10z" class="lg-added"/></svg>Yours</span>
         </div>
+      </div>
+      <div class="banner" role="note">
+        <span class="banner-tag">AI draft</span>
+        <span>An AI guessed this map. Nothing on it is checked until you check it.</span>
       </div>
     </section>
 

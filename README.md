@@ -26,10 +26,11 @@ Any static host works. On GitHub Pages: push this folder to a repository, then i
 | `js/layout.js` | Deterministic force layout. |
 | `js/map.js` | SVG map: pencil-style marks, drag, pan, zoom, keyboard moves. |
 | `js/app.js` | Panel, guess-first, check/doubt, editing, dialogs, import/export. |
+| `js/sources.js` | Real references per concept: Wikipedia articles, and papers with DOIs from OpenAlex (Crossref as fallback). The AI never supplies these. |
 | `js/store.js` | localStorage maps and settings, session-only key, daily call counter. |
 
 A map costs 4 calls when nothing fails, and is capped at 8 calls per run. The app counts calls made today and stops before the daily cap set in Settings (50 by default, matching OpenRouter's free tier).
 
 ## Privacy
 
-The only request carrying user text goes to openrouter.ai, and it contains only the topic and the app's instructions. Free models may train on prompts. The key is never written to maps, exports, URLs or logs.
+Requests carrying user text go to openrouter.ai (the topic and the app's instructions) and, when a concept is opened, its name and search phrase go to Wikipedia, OpenAlex or Crossref to find references. Free models may train on prompts. The key is never written to maps, exports, URLs or logs.

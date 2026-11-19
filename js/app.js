@@ -5,6 +5,7 @@ import { ApiError, fetchFreeModels, startSignIn, finishSignIn } from './openrout
 import { Pipeline, STAGES, regenerateConcept, uid } from './pipeline.js';
 import { createMapView } from './map.js';
 import { freeSpot } from './layout.js';
+import { findReferences, sanitizeRefs } from './sources.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -210,16 +211,22 @@ function conceptPanel(c) {
   if (!mine) {
     if (c.caveat) out.push(h('div', { class: 'box mislead' }, h('strong', {}, 'Where this may mislead'), c.caveat));
     if (c.question) out.push(h('div', { class: 'box breakit' }, h('strong', {}, 'Try to break it'), c.question));
-    const phrases = c.phrases?.length ? c.phrases : [c.name];
-    out.push(
-      h('h3', {}, 'Look it up'),
-      h('p', { class: 'fine' }, 'Search links, not citations. The app builds these; the AI never supplies a URL.'),
-      h('ul', { class: 'search-list' }, phrases.map((q) => h('li', {},
-        h('span', { class: 'q' }, `“${q}”`), h('br'),
-        SEARCH_SITES.map((s) => h('a', { href: s.url(`${q}`), target: '_blank', rel: 'noopener noreferrer' }, s.label)),
-      ))),
-    );
   }
+
+  out.push(
+    h('h3', {}, 'Sources to check against'),
+    h('p', { class: 'fine' }, 'Real records found in Wikipedia and scholarly catalogues (OpenAlex, Crossref), not written by the AI. Check that each one is really about this concept.'),
+    refsBox(c),
+  );
+  const phrases = c.phrases?.length ? c.phrases : [c.name];
+  out.push(
+    h('p', { class: 'refs-kind' }, 'Videos and more searches'),
+    h('p', { class: 'fine' }, 'Search links, not citations.'),
+    h('ul', { class: 'search-list' }, phrases.map((q) => h('li', {},
+      h('span', { class: 'q' }, `“${q}”`), h('br'),
+      SEARCH_SITES.map((s) => h('a', { href: s.url(`${q}`), target: '_blank', rel: 'noopener noreferrer' }, s.label)),
+    ))),
+  );
 
   out.push(h('h3', {}, 'Edit'));
   out.push(...field('Name', c.name, (v) => { c.name = v.trim() || c.name; changed(); }, { max: 120 }));
@@ -237,6 +244,48 @@ function conceptPanel(c) {
   actions.append(h('button', { type: 'button', class: 'btn danger', onclick: () => deleteConcept(c) }, 'Delete concept'));
   out.push(h('h3', {}, 'More'), actions);
   return out;
+}
+
+const refsLoading = new Set();
+
+function refsBox(c) {
+  const box = h('div', { 'aria-live': 'polite' });
+  const draw = (note) => {
+    const r = c.refs;
+    const list = (items) => h('ul', { class: 'refs' }, items.map((x) => h('li', {},
+      h('a', { href: x.url, target: '_blank', rel: 'noopener noreferrer' }, x.title),
+      x.note ? h('span', { class: 'by' }, x.note) : null)));
+    const parts = [];
+    if (note) parts.push(h('p', { class: 'fine' }, note));
+    if (r) {
+      const empty = (kind, what) => h('p', { class: 'fine' }, r.failed?.includes(kind)
+        ? `Could not reach the ${what} catalogue just now. Try Search again.` : `No well-matched ${what}s found.`);
+      parts.push(h('p', { class: 'refs-kind' }, `Papers${r.papersVia ? ` (${r.papersVia})` : ''}`),
+        r.papers.length ? list(r.papers) : empty('papers', 'paper'));
+      parts.push(h('p', { class: 'refs-kind' }, 'Articles (Wikipedia)'),
+        r.articles.length ? list(r.articles) : empty('articles', 'article'));
+      parts.push(h('button', { type: 'button', class: 'btn', onclick: () => load(true) }, 'Search again'));
+    }
+    box.replaceChildren(...parts);
+  };
+  const load = async (force) => {
+    if (refsLoading.has(c.id)) return;
+    if (c.refs && !force) return;
+    refsLoading.add(c.id);
+    draw('Looking up papers and articles…');
+    try {
+      c.refs = await findReferences(c, state.map.topic);
+      save();
+      draw();
+    } catch (err) {
+      draw(`${err.message} Use the search links below instead.`);
+    } finally {
+      refsLoading.delete(c.id);
+    }
+  };
+  draw();
+  load(false);
+  return box;
 }
 
 function linkText(l) {
@@ -506,7 +555,7 @@ function sanitizeMap(raw) {
       explanation: s(c?.explanation), caveat: s(c?.caveat), question: s(c?.question),
       phrases: Array.isArray(c?.phrases) ? c.phrases.map((p) => s(p, 120)).filter(Boolean).slice(0, 3) : [],
       status: origin === 'user' ? 'added' : ['unchecked', 'checked', 'doubted'].includes(c?.status) ? c.status : 'unchecked',
-      guess: s(c?.guess), revealed: !!c?.revealed, notes: s(c?.notes, 5000), flag: s(c?.flag, 200),
+      guess: s(c?.guess), revealed: !!c?.revealed, notes: s(c?.notes, 5000), flag: s(c?.flag, 200), refs: sanitizeRefs(c?.refs),
       x: num(c?.x, 100 + (i % 6) * 180), y: num(c?.y, 100 + Math.floor(i / 6) * 160),
     };
   });

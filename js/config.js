@@ -45,5 +45,6 @@ export const RELATIONS = [
 export const SEARCH_SITES = [
   { label: 'Encyclopedia', url: (q) => `https://en.wikipedia.org/w/index.php?search=${encodeURIComponent(q)}` },
   { label: 'Scholar', url: (q) => `https://scholar.google.com/scholar?q=${encodeURIComponent(q)}` },
-  { label: 'Video', url: (q) => `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}` },
+  { label: 'YouTube', url: (q) => `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}` },
+  { label: 'Khan Academy', url: (q) => `https://www.khanacademy.org/search?page_search_query=${encodeURIComponent(q)}` },
 ];
